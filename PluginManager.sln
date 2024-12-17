@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginManager", "PluginManager.csproj", "{3A68E0F0-2BFA-4C35-AE44-BED11379BBAB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A68E0F0-2BFA-4C35-AE44-BED11379BBAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A68E0F0-2BFA-4C35-AE44-BED11379BBAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A68E0F0-2BFA-4C35-AE44-BED11379BBAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A68E0F0-2BFA-4C35-AE44-BED11379BBAB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
