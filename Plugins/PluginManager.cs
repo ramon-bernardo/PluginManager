@@ -30,17 +30,17 @@ public sealed class PluginManager
         try
         {
             plugin.OnLoad(this);
-
-            // After load, enable the plugin.
-            EnablePlugin(plugin);
-
-            LoadedPlugins.Add(plugin);
         }
         catch (Exception ex)
         {
             // TODO: handle this error
             Console.WriteLine(string.Format("Failed to load plugin ({0}): {1}", plugin.Name, ex.Message));
         }
+
+        // After load, enable the plugin.
+        EnablePlugin(plugin);
+
+        LoadedPlugins.Add(plugin);
     }
 
     public void UnloadPlugin(IPlugin plugin)
@@ -54,22 +54,25 @@ public sealed class PluginManager
         // Before unload, disable the plugin.
         DisablePlugin(plugin);
 
+        // Remove the registered events.
+        EventManager.Unregister(plugin);
+
         try
         {
             plugin.OnUnload(this);
-
-            LoadedPlugins.Remove(plugin);
         }
         catch (Exception ex)
         {
             // TODO: handle this error
             Console.WriteLine(string.Format("Failed to unload plugin ({0}): {1}", plugin.Name, ex.Message));
         }
+
+        LoadedPlugins.Remove(plugin);
     }
 
     public void UnloadPlugins()
     {
-        foreach (var plugin in EnabledPlugins)
+        foreach (var plugin in LoadedPlugins.Reverse()) // TODO: remove reverse iter
         {
             UnloadPlugin(plugin);
         }
@@ -90,6 +93,7 @@ public sealed class PluginManager
         }
 
         EventManager.Send<PluginEnableEvent>(plugin);
+        EventManager.EnableCallback(plugin);
 
         EnabledPlugins.Add(plugin);
     }
@@ -109,13 +113,14 @@ public sealed class PluginManager
         }
 
         EventManager.Send<PluginDisableEvent>(plugin);
+        EventManager.DisableCallback(plugin);
 
         EnabledPlugins.Remove(plugin);
     }
 
     public void DisablePlugins()
     {
-        foreach (var plugin in EnabledPlugins)
+        foreach (var plugin in EnabledPlugins.Reverse()) // TODO: remove reverse iter
         {
             DisablePlugin(plugin);
         }
@@ -136,7 +141,7 @@ public sealed class PluginManager
         return EnabledPlugins.Contains(plugin);
     }
 
-    public void RegisterListener(IEventListener listener)
+    public void RegisterListener(IPlugin plugin, IEventListener listener)
     {
         var methods = listener.GetType()
                               .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) // TODO: doc.
@@ -169,7 +174,7 @@ public sealed class PluginManager
                 throw new InvalidOperationException(string.Format("Failed to create an instance of event type {0}.", eventParameterType.FullName));
             }
 
-            EventManager.Register(e, methodAttribute.Priority, method);
+            EventManager.Register(plugin, e, methodAttribute.Priority, method);
         }
     }
 

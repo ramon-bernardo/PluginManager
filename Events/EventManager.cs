@@ -1,23 +1,22 @@
-﻿using System.Reflection;
+﻿using PluginManager.Plugins;
+using System.Reflection;
 
 namespace PluginManager.Events;
 
-using EventMethodsPriority = IDictionary<EventPriority, IList<MethodInfo>>;
-
 internal sealed class EventManager
 {
-    private readonly IDictionary<IEvent, EventMethodsPriority> Events;
+    private readonly IDictionary<IEvent, EventMethods> Events; // FIXME: list of methods
 
-    public EventManager()
+    internal EventManager()
     {
-        Events = new Dictionary<IEvent, EventMethodsPriority>();
+        Events = new Dictionary<IEvent, EventMethods>();
     }
 
-    public void Register(IEvent e, EventPriority priority, MethodInfo method)
+    internal void Register(IPlugin plugin, IEvent e, EventPriority priority, MethodInfo method)
     {
         if (!Events.TryGetValue(e, out var priorityEventMethods))
         {
-            priorityEventMethods = new Dictionary<EventPriority, IList<MethodInfo>>();
+            priorityEventMethods = new EventMethods(plugin);
             Events.Add(e, priorityEventMethods);
         }
 
@@ -30,12 +29,42 @@ internal sealed class EventManager
         methods.Add(method);
     }
 
-    public void Unregister(IEvent e)
+    internal void Unregister(IPlugin plugin)
     {
-        Events.Remove(e);
+        foreach (var e in Events.Reverse()) // TODO: remove reverse iter
+        {
+            if (e.Value.Plugin == plugin)
+            {
+                Events.Remove(e.Key);
+            }
+        }
     }
 
-    public T Send<T>(params object[] args)
+    internal void EnableCallback(IPlugin plugin)
+    {
+        foreach (var e in Events)
+        {
+            var methods = e.Value;
+            if (methods.Plugin == plugin)
+            {
+                methods.Enabled = true;
+            }
+        }
+    }
+
+    internal void DisableCallback(IPlugin plugin)
+    {
+        foreach (var e in Events)
+        {
+            var methods = e.Value;
+            if (methods.Plugin == plugin)
+            {
+                methods.Enabled = false;
+            }
+        }
+    }
+
+    internal T Send<T>(params object[] args)
         where T : IEvent
     {
         var type = typeof(T);
@@ -49,11 +78,16 @@ internal sealed class EventManager
         return Send(e);
     }
 
-    public T Send<T>(T e)
+    internal T Send<T>(T e)
         where T : IEvent
     {
         // Find callback methods associated with the event
         if (!Events.TryGetValue(e, out var eventMethods))
+        {
+            return e;
+        }
+
+        if (!eventMethods.Enabled)
         {
             return e;
         }
