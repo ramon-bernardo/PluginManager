@@ -1,14 +1,14 @@
 # Plugin Manager
 
-A lightweight and extensible plugin management library written in [C#](https://dotnet.microsoft.com/languages/csharp). Inspired by the [Bukkit](https://bukkit.org/) plugin system, it offers a structured approach to loading, enabling, disabling, and unloading plugins in your apps.
+A lightweight and extensible plugin management library inspired by the [Bukkit](https://bukkit.org/) plugin system, it offers a structured approach to loading, enabling, disabling, and unloading plugins in your apps.
 
-Beyond managing the plugin lifecycle, the library features a robust event system that allows seamless communication between plugins. You can define `custom events`, register `listeners`, and control event execution using `priorities` or by marking events as `cancellable`.
+Beyond managing the plugin lifecycle, the library features a robust event system that allows seamless communication between plugins. You can define `custom events`, register `listeners` and control event execution using `priorities`, with the option to mark as `cancellable`.
 
 ## Usage
 
 ### Creating a plugin
 
-To create a plugin, implement the `IPlugin` interface. This requires specifying the plugin name, version and implementing the lifecycle methods.
+To create a plugin, implement the `IPlugin` interface. This requires specifying the plugin name, version and implementing the `OnLoad` and `OnUnload` as optional methods.
 
 ```csharp
 public class ExamplePlugin : IPlugin
@@ -33,7 +33,6 @@ public class ExamplePlugin : IPlugin
 
 Use the `PluginManager` class to dynamically load and manage your plugins. Plugins can either be instantiated manually or loaded directly from assemblies or files using the provided loader utility.
 
-
 #### Manually Loading Plugins
 
 ```csharp
@@ -44,7 +43,7 @@ manager.LoadPlugin(plugin);
 manager.UnloadPlugin(plugin);
 ```
 
-#### Dynamically Loading Plugins from Files or Assemblies
+#### Dynamically Loading Plugins
 
 The `PluginManager` includes utilities to discover and load plugins directly from `.dll` files or assembly objects.
 
@@ -79,6 +78,8 @@ foreach (var plugin in plugins)
 ## Event Handling
 
 Plugins can interact with custom events through the event system. Events are defined by implementing the `IEvent` interface. For cancellable events, use `ICancellableEvent` interface.
+
+Use the `Event` attribute to handle events and the `Priority` (`Low`, `Normal`, and `High`) property to define the execution priority.
 
 #### Defining an Event
 
