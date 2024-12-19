@@ -40,30 +40,6 @@ internal sealed class EventManager
         }
     }
 
-    internal void EnableCallback(IPlugin plugin)
-    {
-        foreach (var e in Events)
-        {
-            var methods = e.Value;
-            if (methods.Plugin == plugin)
-            {
-                methods.Enabled = true;
-            }
-        }
-    }
-
-    internal void DisableCallback(IPlugin plugin)
-    {
-        foreach (var e in Events)
-        {
-            var methods = e.Value;
-            if (methods.Plugin == plugin)
-            {
-                methods.Enabled = false;
-            }
-        }
-    }
-
     internal T Send<T>(params object[] args)
         where T : IEvent
     {
@@ -83,11 +59,6 @@ internal sealed class EventManager
     {
         // Find callback methods associated with the event
         if (!Events.TryGetValue(e, out var eventMethods))
-        {
-            return e;
-        }
-
-        if (!eventMethods.Enabled)
         {
             return e;
         }
