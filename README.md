@@ -128,5 +128,5 @@ public class ExamplePlugin : IPlugin
 Use the `SendEvent` method to dispatch events:
 
 ```csharp
-var e = manager.SendEvent<ExampleEvent>("Hello, Plugin!");
+var e = manager.SendEvent(new ExampleEvent("Hello, Plugin!"));
 ```

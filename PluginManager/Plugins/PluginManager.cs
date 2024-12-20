@@ -124,9 +124,8 @@ public sealed class PluginManager
         }
     }
 
-    public T SendEvent<T>(params object[] args)
-        where T : IEvent
+    public IEvent SendEvent(IEvent e)
     {
-        return EventManager.Send<T>(args);
+        return EventManager.Send(e);
     }
 }
