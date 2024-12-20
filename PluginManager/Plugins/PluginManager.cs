@@ -114,17 +114,13 @@ public sealed class PluginManager
                 continue;
             }
 
-            var e = (IEvent?)Activator.CreateInstance(eventParameterType);
-            if (e == null)
-            {
-                throw new InvalidOperationException(string.Format("Failed to create an instance of event type {0}.", eventParameterType.FullName));
-            }
-
-            EventManager.Register(plugin, e, methodAttribute.Priority, method);
+            var eventName = eventParameterType.Name;
+            EventManager.Register(plugin, eventName, listener, methodAttribute.Priority, method);
         }
     }
 
-    public IEvent SendEvent(IEvent e)
+    public T SendEvent<T>(T e)
+        where T : IEvent
     {
         return EventManager.Send(e);
     }

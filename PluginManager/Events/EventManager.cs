@@ -5,19 +5,19 @@ namespace PluginManager.Events;
 
 internal sealed class EventManager
 {
-    private readonly IDictionary<IEvent, IDictionary<EventPriority, IList<EventMethod>>> Events; // FIXME: list of methods
+    private readonly IDictionary<string, IDictionary<EventPriority, IList<EventMethod>>> Events; // FIXME: list of methods
 
     internal EventManager()
     {
-        Events = new Dictionary<IEvent, IDictionary<EventPriority, IList<EventMethod>>>();
+        Events = new Dictionary<string, IDictionary<EventPriority, IList<EventMethod>>>();
     }
 
-    internal void Register(IPlugin plugin, IEvent e, EventPriority priority, MethodInfo method)
+    internal void Register(IPlugin plugin, string eventName, IEventListener listener, EventPriority priority, MethodInfo method)
     {
-        if (!Events.TryGetValue(e, out var priorityEventMethods))
+        if (!Events.TryGetValue(eventName, out var priorityEventMethods))
         {
             priorityEventMethods = new Dictionary<EventPriority, IList<EventMethod>>();
-            Events.Add(e, priorityEventMethods);
+            Events.Add(eventName, priorityEventMethods);
         }
 
         if (!priorityEventMethods.TryGetValue(priority, out var methods))
@@ -28,7 +28,7 @@ internal sealed class EventManager
 
         if (!methods.Any(method => method.Plugin == plugin))
         {
-            methods.Add(new EventMethod(plugin, method));
+            methods.Add(new EventMethod(plugin, listener, method));
         }
     }
 
@@ -39,7 +39,7 @@ internal sealed class EventManager
             return;
         }
 
-        foreach (var (e, priorityEventMethods) in Events.ToList())
+        foreach (var (eventName, priorityEventMethods) in Events.ToList())
         {
             foreach (var (priority, methods) in priorityEventMethods.ToList())
             {
@@ -56,7 +56,7 @@ internal sealed class EventManager
 
             if (!priorityEventMethods.Any())
             {
-                Events.Remove(e);
+                Events.Remove(eventName);
             }
         }
     }
@@ -64,8 +64,11 @@ internal sealed class EventManager
     internal T Send<T>(T e)
         where T : IEvent
     {
+        var type = e.GetType();
+        var eventName = type.Name;
+
         // Find callback methods associated with the event
-        if (!Events.TryGetValue(e, out var eventMethods))
+        if (!Events.TryGetValue(eventName, out var eventMethods))
         {
             return e;
         }
@@ -78,7 +81,7 @@ internal sealed class EventManager
         {
             try
             {
-                method.Method.Invoke(this, [e]); // Failable, should be wrapped in a try-catch block
+                method.Method.Invoke(method.Listener, [e]); // Failable, should be wrapped in a try-catch block
             }
             catch (Exception ex)
             {
