@@ -4,6 +4,14 @@ A lightweight and extensible plugin management library inspired by the [Bukkit](
 
 Beyond managing the plugin lifecycle, the library features a robust event system that allows seamless communication between plugins. You can define `custom events`, register `listeners` and control event execution using `priorities`, with the option to mark as `cancellable`.
 
+## Examples
+
+For usage examples, see:
+
+- [Chat Priority Example](PluginManager.Examples/ChatPriorityExample.cs): Demonstrates the handling of chat events with configurable priorities and support for cancellation. Includes a command system with an example of processing "online" command and observing chat messages.
+
+- [Movement Example](PluginManager.Examples/MovementExample.cs): Highlights the management of movement events, enabling observers to modify or cancel events, showcasing how position data can be altered in response to specific conditions.
+
 ## Usage
 
 ### Creating a plugin

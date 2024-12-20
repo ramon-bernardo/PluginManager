@@ -53,7 +53,7 @@ internal class ChatPriorityExample
         {
             if (e.Cancelled)
             {
-                // ignore if cancelled
+                // ignore if cancelled by another observer.
                 return;
             }
 
@@ -65,7 +65,7 @@ internal class ChatPriorityExample
         {
             if (e.Cancelled)
             {
-                // ignore if cancelled
+                // ignore if cancelled by another observer.
                 return;
             }
 
